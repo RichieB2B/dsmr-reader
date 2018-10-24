@@ -198,6 +198,40 @@
                             </td>
                         </tr>
                         {% endif %}
+
+                        {% if electricity_statistics.lowest_usage_l1_value %}
+                        <tr>
+                            <td class="col-md-6">{% trans "Lowest usage (L1+)" %}</td>
+                            <td class="col-md-6">
+                                <span class="badge bg-red">
+                                   <i class="fas fa-bolt"></i> &nbsp; {{ electricity_statistics.lowest_usage_l1_value }} &nbsp; 
+                                   {% trans "Watt" %} &nbsp; - &nbsp; {{ electricity_statistics.lowest_usage_l1_timestamp }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if electricity_statistics.lowest_usage_l2_value %}
+                        <tr>
+                            <td class="col-md-6">{% trans "Lowest usage (L2+)" %}</td>
+                            <td class="col-md-6">
+                                <span class="badge bg-red">
+                                   <i class="fas fa-bolt"></i> &nbsp; {{ electricity_statistics.lowest_usage_l2_value }} &nbsp; 
+                                   {% trans "Watt" %} &nbsp; - &nbsp; {{ electricity_statistics.lowest_usage_l2_timestamp }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if electricity_statistics.lowest_usage_l3_value %}
+                        <tr>
+                            <td class="col-md-6">{% trans "Lowest usage (L3+)" %}</td>
+                            <td class="col-md-6">
+                                <span class="badge bg-red">
+                                   <i class="fas fa-bolt"></i> &nbsp; {{ electricity_statistics.lowest_usage_l3_value }} &nbsp; 
+                                   {% trans "Watt" %} &nbsp; - &nbsp; {{ electricity_statistics.lowest_usage_l3_timestamp }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endif %}
                         
                         {% if electricity_statistics.highest_return_l1_value %}
                         <tr>
