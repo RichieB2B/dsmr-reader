@@ -838,8 +838,8 @@ msgstr "Het aantal P1 DSMR telegram-metingen die opgeslagen zijn."
 msgid "Show"
 msgstr "Toon"
 
-msgid "All time highs"
-msgstr "Allertijden records"
+msgid "All time highs & lows"
+msgstr "Hoogte- en laagte records"
 
 msgid "Highest usage (L1+)"
 msgstr "Hoogste verbruik (L1+)"
@@ -867,6 +867,9 @@ msgstr "Hoogste teruglevering (L2-)"
 
 msgid "Highest return (L3-)"
 msgstr "Hoogste teruglevering (L3-)"
+
+msgid "Enable \"Track electricity phases\" in the Datalogger Configuration to track this data."
+msgstr "Vink \"Houd elektriciteitsfasen bij\" aan, in de Dataloggerconfiguratie, om deze gegevens bij te houden. "
 
 msgid "Current energy prices"
 msgstr "Huidige energietarieven"
