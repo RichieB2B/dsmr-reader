@@ -111,7 +111,12 @@ def get_temperature_from_netatmo():
         logger.exception(error)
         raise AssertionError(_('Failed to connect to or read from Netatmo API'))
 
-    station_data = [x for x in ws.devices[0]['modules'] if x['type'] == 'NAModule1']
+    station_data = None
+    for wsd in ws.devices:
+        if wsd.get('modules'):
+            station_data = [x for x in wsd['modules'] if x['type'] == 'NAModule1']
+            if station_data:
+                break
 
     if not station_data:
         raise AssertionError(_('Selected station info not found'))
