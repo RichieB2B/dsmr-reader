@@ -434,11 +434,23 @@ def year_statistics(target_date: datetime.date):
 def period_totals() -> Dict:
     """Retrieves year/month period totals and merges them with today's consumption."""
     today = timezone.localtime(timezone.now())
+    yesterday = today - timezone.timedelta(days=1)
 
     try:
         today_stats = dsmr_consumption.services.day_consumption(day=today)
     except LookupError:
         today_stats = {}
+
+    # also add yesterday stats if day totals are not available yet
+    # see https://github.com/dsmrreader/dsmr-reader/issues/1811
+    yesterday_totals = day_statistics(target_date=yesterday)
+    if not any(x for x in yesterday_totals.values()):
+        try:
+            yesterday_stats = dsmr_consumption.services.day_consumption(day=yesterday)
+        except LookupError:
+            yesterday_stats = {}
+    else:
+        yesterday_stats = {}
 
     month_stats = month_statistics(target_date=today)
     year_stats = year_statistics(target_date=today)
@@ -454,6 +466,7 @@ def period_totals() -> Dict:
             continue
 
         # Assumes same keys, zero value fallback.
+        month_stats[k] += yesterday_stats.get(k, 0)
         month_stats[k] += today_stats.get(k, 0)
 
     for k in year_stats.keys():
@@ -461,6 +474,7 @@ def period_totals() -> Dict:
             continue
 
         # Assumes same keys, zero value fallback.
+        year_stats[k] += yesterday_stats.get(k, 0)
         year_stats[k] += today_stats.get(k, 0)
 
     return dict(
