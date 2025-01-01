@@ -4,7 +4,7 @@ import logging
 from django.utils import timezone
 from django.conf import settings
 import requests
-import netatmo
+import lnetatmo
 
 from dsmr_backend.models.schedule import ScheduledProcess
 from dsmr_weather.models.settings import WeatherSettings
@@ -67,6 +67,7 @@ def get_temperature_from_buienradar() -> TemperatureReading:
         read_at=hour_mark, degrees_celcius=Decimal(temperature)
     )
 
+<<<<<<< HEAD
 def get_temperature_from_netatmo():
     ws = netatmo.WeatherStation()
     try:
@@ -103,23 +104,24 @@ def get_temperature_from_netatmo():
     hour_mark = timezone.now().replace(minute=0, second=0, microsecond=0)
     return TemperatureReading.objects.create(read_at=hour_mark, degrees_celcius=Decimal(temperature))
 
-def get_temperature_from_netatmo():
+def get_temperature_from_netatmo() -> TemperatureReading:
     ws = netatmo.WeatherStation()
     try:
-        ws.get_data()
+        authorization = lnetatmo.ClientAuth()
+        ws = lnetatmo.WeatherStationData(authorization)
     except Exception as error:
         logger.exception(error)
-        raise AssertionError(_('Failed to connect to or read from Netatmo API'))
+        raise AssertionError('Failed to connect to or read from Netatmo API')
 
     station_data = None
-    for wsd in ws.devices:
+    for name, wsd in ws.stations.items():
         if wsd.get('modules'):
             station_data = [x for x in wsd['modules'] if x['type'] == 'NAModule1']
             if station_data:
                 break
 
     if not station_data:
-        raise AssertionError(_('Selected station info not found'))
+        raise AssertionError(_('Selected Netatmo station info not found'))
 
     temperature = station_data[0]['dashboard_data']['Temperature']
     logger.debug('Netatmo: Read temperature: %s', temperature)
