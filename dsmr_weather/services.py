@@ -4,6 +4,7 @@ import logging
 from django.utils import timezone
 from django.conf import settings
 import requests
+import netatmo
 
 from dsmr_backend.models.schedule import ScheduledProcess
 from dsmr_weather.models.settings import WeatherSettings
@@ -16,7 +17,7 @@ logger = logging.getLogger("dsmrreader")
 def run(scheduled_process: ScheduledProcess) -> None:
     """Reads the current weather state and stores it."""
     try:
-        temperature_reading = get_temperature_from_api()
+        temperature_reading = get_temperature_from_netatmo()
     except Exception as error:
         logger.error("Buienradar: {}".format(error))
 
@@ -28,7 +29,7 @@ def run(scheduled_process: ScheduledProcess) -> None:
     )
 
 
-def get_temperature_from_api() -> TemperatureReading:
+def get_temperature_from_buienradar() -> TemperatureReading:
     # For backend logging in Supervisor.
     logger.debug(
         "Buienradar: Reading temperature: %s", settings.DSMRREADER_BUIENRADAR_API_URL
@@ -65,3 +66,20 @@ def get_temperature_from_api() -> TemperatureReading:
     return TemperatureReading.objects.create(
         read_at=hour_mark, degrees_celcius=Decimal(temperature)
     )
+
+def get_temperature_from_netatmo():
+    ws = netatmo.WeatherStation()
+    try:
+        ws.get_data()
+    except Exception as error:
+        logger.exception(error)
+        raise AssertionError(_('Failed to connect to or read from Netatmo API'))
+
+		station_data = [x for x in ws.devices[0]['modules'] if x['type'] == 'NAModule1']
+        raise AssertionError(_('Selected station info not found'))
+
+    temperature = station_data[0]['dashboard_data']['Temperature']
+    logger.debug('Netatmo: Read temperature: %s', temperature)
+
+    hour_mark = timezone.now().replace(minute=0, second=0, microsecond=0)
+    return TemperatureReading.objects.create(read_at=hour_mark, degrees_celcius=Decimal(temperature))

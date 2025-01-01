@@ -23,9 +23,9 @@ class TestDsmrWeatherServices(TestCase):
             active=True, planned=timezone.make_aware(timezone.datetime(2017, 1, 1))
         )
 
-    @mock.patch("dsmr_weather.services.get_temperature_from_api")
+    @mock.patch('dsmr_weather.services.get_temperature_from_buienradar')
     @mock.patch("django.utils.timezone.now")
-    def test_exception_handling(self, now_mock, get_temperature_from_api_mock):
+    def test_exception_handling(self, now_mock, get_temperature_from_buienradar_mock):
         now_mock.return_value = timezone.make_aware(timezone.datetime(2017, 1, 1))
         get_temperature_from_api_mock.side_effect = AssertionError(
             "TEST"
@@ -78,7 +78,7 @@ class TestDsmrWeatherServices(TestCase):
         requests_mock.side_effect = IOError("Failed to connect")  # Any error is fine.
 
         with self.assertRaises(RuntimeError):
-            dsmr_weather.services.get_temperature_from_api()
+            dsmr_weather.services.get_temperature_from_buienradar()
 
     @mock.patch("requests.get")
     @mock.patch("django.utils.timezone.now")
@@ -89,7 +89,7 @@ class TestDsmrWeatherServices(TestCase):
         requests_mock.return_value = response_mock
 
         with self.assertRaises(RuntimeError):
-            dsmr_weather.services.get_temperature_from_api()
+            dsmr_weather.services.get_temperature_from_buienradar()
 
     @mock.patch("requests.get")
     @mock.patch("django.utils.timezone.now")
@@ -110,5 +110,5 @@ class TestDsmrWeatherServices(TestCase):
         type(response_mock).status_code = mock.PropertyMock(return_value=200)
         requests_mock.return_value = response_mock
 
-        with self.assertRaises(RuntimeError):
             dsmr_weather.services.get_temperature_from_api()
+            dsmr_weather.services.get_temperature_from_buienradar()
