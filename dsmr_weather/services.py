@@ -83,3 +83,20 @@ def get_temperature_from_netatmo():
 
     hour_mark = timezone.now().replace(minute=0, second=0, microsecond=0)
     return TemperatureReading.objects.create(read_at=hour_mark, degrees_celcius=Decimal(temperature))
+
+def get_temperature_from_netatmo():
+    ws = netatmo.WeatherStation()
+    try:
+        ws.get_data()
+    except Exception as error:
+        logger.exception(error)
+        raise AssertionError(_('Failed to connect to or read from Netatmo API'))
+
+    station_data = [x for x in ws.devices[0]['modules'] if x['type'] == 'NAModule1']
+        raise AssertionError(_('Selected station info not found'))
+
+    temperature = station_data[0]['dashboard_data']['Temperature']
+    logger.debug('Netatmo: Read temperature: %s', temperature)
+
+    hour_mark = timezone.now().replace(minute=0, second=0, microsecond=0)
+    return TemperatureReading.objects.create(read_at=hour_mark, degrees_celcius=Decimal(temperature))

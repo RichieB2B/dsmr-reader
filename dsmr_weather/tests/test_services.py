@@ -110,5 +110,5 @@ class TestDsmrWeatherServices(TestCase):
         type(response_mock).status_code = mock.PropertyMock(return_value=200)
         requests_mock.return_value = response_mock
 
-            dsmr_weather.services.get_temperature_from_api()
+        with self.assertRaises(AssertionError):
             dsmr_weather.services.get_temperature_from_buienradar()
