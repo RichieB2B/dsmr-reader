@@ -225,20 +225,26 @@ def create_hourly_statistics(hour_start: timezone.datetime) -> Optional[HourStat
         logger.debug("Stats: Skipping duplicate hour statistics for: %s", hour_start)
         return
 
-    electricity_start = electricity_readings.first()
-    electricity_end = electricity_readings.last()
-    creation_kwargs["electricity1"] = (
-        electricity_end.delivered_1 - electricity_start.delivered_1
-    )
-    creation_kwargs["electricity2"] = (
-        electricity_end.delivered_2 - electricity_start.delivered_2
-    )
-    creation_kwargs["electricity1_returned"] = (
-        electricity_end.returned_1 - electricity_start.returned_1
-    )
-    creation_kwargs["electricity2_returned"] = (
-        electricity_end.returned_2 - electricity_start.returned_2
-    )
+    try:
+        electricity_start = electricity_readings.first()
+        electricity_end = electricity_readings.last()
+        creation_kwargs["electricity1"] = (
+            electricity_end.delivered_1 - electricity_start.delivered_1
+        )
+        creation_kwargs["electricity2"] = (
+            electricity_end.delivered_2 - electricity_start.delivered_2
+        )
+        creation_kwargs["electricity1_returned"] = (
+            electricity_end.returned_1 - electricity_start.returned_1
+        )
+        creation_kwargs["electricity2_returned"] = (
+            electricity_end.returned_2 - electricity_start.returned_2
+        )
+    except:
+        creation_kwargs["electricity1"] = 0
+        creation_kwargs["electricity2"] = 0
+        creation_kwargs["electricity1_returned"] = 0
+        creation_kwargs["electricity2_returned"] = 0
 
     # DSMR v4.
     if len(gas_readings) == 1:
@@ -248,6 +254,11 @@ def create_hourly_statistics(hour_start: timezone.datetime) -> Optional[HourStat
     elif len(gas_readings) > 1:
         gas_readings = list(gas_readings)
         creation_kwargs["gas"] = gas_readings[-1].delivered - gas_readings[0].delivered
+        try:
+            creation_kwargs["gas"] = next_gas_readings.first().delivered - gas_readings.first().delivered
+        except:
+            creation_kwargs["gas"] = 0
+
 
     return HourStatistics.objects.create(**creation_kwargs)
 
